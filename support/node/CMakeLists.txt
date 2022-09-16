@@ -58,10 +58,7 @@ include_directories(
 		${FLUENT_INC}\\fluent${RELEASE}\\multiport\\mpi_wrapper\\src
 		${FLUENT_INC}\\include)
 LINK_DIRECTORIES(${LIBS})
-ADD_LIBRARY(libudf1 SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
+ADD_LIBRARY(libudf_node SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION})
-TARGET_LINK_LIBRARIES(libudf1 ${FLUENT_LIB})
-add_custom_command(TARGET libudf1
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E rename ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION}/libudf1.dll ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION}/libudf.dll
-		)
+set_target_properties(libudf_node PROPERTIES OUTPUT_NAME libudf)
+TARGET_LINK_LIBRARIES(libudf_node ${FLUENT_LIB})

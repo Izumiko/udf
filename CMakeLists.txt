@@ -6,11 +6,11 @@ set(DIM 3d)             #3D
 SET(RELEASE 22.2.0)     #22.2.0=Fluent 2022R2
 SET(FLUENT_ARCH win64)  #Windows 64bit
 set(LIB_RELEASE 2220)   #2220=Fluent 2022R2
+set(PARALLEL_NODE intel)
 #############################
 
 cmake_minimum_required(VERSION 3.19)
 project(udf)
-set(PARALLEL_NODE intel)
 
 # Get FLUENT_INC from environment variable
 string(SUBSTRING ${LIB_RELEASE} 0 3 SHORTVER)
@@ -44,9 +44,11 @@ file(APPEND ${UDFNAMES} "  *minor = RampantReleaseMinor;\n")
 file(APPEND ${UDFNAMES} "  *revision = RampantReleaseRevision;\n}\n")
 
 # Generate udf io header with fluent's resolve command
+if(WIN32)
 execute_process(COMMAND "${FLUENT_INC}\\ntbin\\win64\\resolve.exe" -udf "${PROJECT_SOURCE_DIR}\\${CSOURCES}" -head_file ud_io1.h
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/support
 		)
+endif()
 
 # Add actual project files of host and node version
 ADD_SUBDIRECTORY(support/host)

@@ -58,6 +58,7 @@ include_directories(
 		${FLUENT_INC}\\fluent${RELEASE}\\multiport\\mpi_wrapper\\src
 		${FLUENT_INC}\\include)
 LINK_DIRECTORIES(${LIBS})
-ADD_LIBRARY(libudf SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
+ADD_LIBRARY(libudf_host SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION})
-TARGET_LINK_LIBRARIES(libudf ${FLUENT_LIB})
+set_target_properties(libudf_host PROPERTIES OUTPUT_NAME libudf)
+TARGET_LINK_LIBRARIES(libudf_host ${FLUENT_LIB})
