@@ -62,3 +62,7 @@ ADD_LIBRARY(libudf_host SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION})
 set_target_properties(libudf_host PROPERTIES OUTPUT_NAME libudf)
 TARGET_LINK_LIBRARIES(libudf_host ${FLUENT_LIB})
+
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
+	add_custom_command(TARGET libudf_host POST_BUILD COMMAND move "$(TargetPath)" "$(TargetDir)..\\")
+endif()
