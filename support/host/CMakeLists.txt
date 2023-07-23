@@ -1,27 +1,14 @@
 #########################
-set(VERSION ${DIM}dp_host)
+set(VERSION ${DIM}${PREC}_host)
 ########################
 
 ##########################
-ADD_DEFINITIONS(-DUDF_EXPORTING)
-ADD_DEFINITIONS(-DUDF_NT)
-IF ((${VERSION} STREQUAL 2d_host) OR (${VERSION} STREQUAL 3d_host) OR (${VERSION} STREQUAL 2ddp_host) OR (${VERSION} STREQUAL 3ddp_host))
-	set(COMM net)
-	set(FLUENT_LIB mport.lib fl${LIB_RELEASE}.lib)
-	set(LIBS ${FLUENT_INC}\\fluent${RELEASE}\\${FLUENT_ARCH}\\${VERSION} ${FLUENT_INC}\\fluent${RELEASE}\\MULTIPORT\\${FLUENT_ARCH}\\${COMM}\\SHARED)
-ELSEIF ((${VERSION} STREQUAL 2d) OR (${VERSION} STREQUAL 3d) OR (${VERSION} STREQUAL 2ddp) OR (${VERSION} STREQUAL 3ddp))
-	set(FLUENT_LIB fl${LIB_RELEASE}.lib)
-	set(LIBS ${FLUENT_INC}\\fluent${RELEASE}\\${FLUENT_ARCH}\\${VERSION})
-ELSEIF ((${VERSION} STREQUAL 2d_node) OR (${VERSION} STREQUAL 3d_node) OR (${VERSION} STREQUAL 2ddp_node) OR (${VERSION} STREQUAL 3ddp_node))
-	IF ((NOT (${PARALLEL_NODE} STREQUAL none)) AND (NOT (${PARALLEL_NODE} STREQUAL net)))
-		set(PARALLEL_NODE mpi)
-	ENDIF ()
-	SET(COMM mpi)
-	set(FLUENT_LIB fl_${PARALLEL_NODE}${LIB_RELEASE} mport)
-	set(LIBS ${FLUENT_INC}\\fluent${RELEASE}\\${FLUENT_ARCH}\\${VERSION}
-			${FLUENT_INC}\\fluent${RELEASE}\\MULTIPORT\\${FLUENT_ARCH}\\${COMM}\\SHARED
-			${FLUENT_INC}\\ntbin\\clang\\lib)
-ENDIF ()
+add_definitions(-DUDF_EXPORTING)
+add_definitions(-DUDF_NT)
+
+set(COMM net)
+set(FLUENT_LIB mport.lib fl${LIB_RELEASE}.lib)
+set(LIBS ${FLUENT_INC}\\fluent${RELEASE}\\${FLUENT_ARCH}\\${VERSION} ${FLUENT_INC}\\fluent${RELEASE}\\MULTIPORT\\${FLUENT_ARCH}\\${COMM}\\SHARED)
 
 include_directories(
 		${PROJECT_SOURCE_DIR}/support
@@ -57,11 +44,11 @@ include_directories(
 		${FLUENT_INC}\\fluent${RELEASE}\\multiport\\src
 		${FLUENT_INC}\\fluent${RELEASE}\\multiport\\mpi_wrapper\\src
 		${FLUENT_INC}\\include)
-LINK_DIRECTORIES(${LIBS})
-ADD_LIBRARY(libudf_host SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
+link_directories(${LIBS})
+add_library(libudf_host SHARED ./../../${CSOURCES} ./../../${CHEADERS} ./../udf_names.c)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../${FLUENT_ARCH}/${VERSION})
 set_target_properties(libudf_host PROPERTIES OUTPUT_NAME libudf)
-TARGET_LINK_LIBRARIES(libudf_host ${FLUENT_LIB})
+target_link_libraries(libudf_host ${FLUENT_LIB})
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
 	add_custom_command(TARGET libudf_host POST_BUILD COMMAND move "$(TargetPath)" "$(TargetDir)..\\")

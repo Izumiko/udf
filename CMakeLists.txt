@@ -3,10 +3,11 @@
 set(CSOURCES example.c) #only one#
 set(CHEADERS)           #only one#
 set(DIM 3d)             #3D
+set(PREC dp)            #Precision: dp=double precision, empty for single precision
+set(PARALLEL TRUE)      #Parallel or Serial
 SET(RELEASE 22.2.0)     #22.2.0=Fluent 2022R2
 SET(FLUENT_ARCH win64)  #Windows 64bit
 set(LIB_RELEASE 2220)   #2220=Fluent 2022R2
-set(PARALLEL_NODE intel)
 #############################
 
 cmake_minimum_required(VERSION 3.19)
@@ -41,6 +42,10 @@ if(WIN32)
 		)
 endif()
 
-# Add actual project files of host and node version
-ADD_SUBDIRECTORY(support/host)
-ADD_SUBDIRECTORY(support/node)
+# Add actual project files of parallel (host/node) or serial.
+if (PARALLEL)
+	add_subdirectory(support/host)
+	add_subdirectory(support/node)
+else ()
+	add_subdirectory(support/serial)
+endif ()
