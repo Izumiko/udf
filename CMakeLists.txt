@@ -21,31 +21,22 @@ string(APPEND FLUENT_INC $ENV{${ROOT_PATH}} "\\fluent")
 file(REMOVE "${PROJECT_SOURCE_DIR}/support/*.c" "${PROJECT_SOURCE_DIR}/support/*.h")
 
 # Generate udf_names.c based on user's udf file
-SET(UDFNAMES ${PROJECT_SOURCE_DIR}/support/udf_names.c)
-file(WRITE ${UDFNAMES} "/* This file generated automatically. */\n/*          Do not modify.            */\n")
-file(APPEND ${UDFNAMES} "#include \"udf.h\"\n#include \"prop.h\"\n#include \"dpm.h\"\n")
 file(STRINGS ${CSOURCES} FUNCS REGEX "^ *DEFINE_[_A-Z]+ *\\(.*\\)")
+set(FUNCS_DECL "")
+set(FUNCS_DATA "")
 foreach(F IN LISTS FUNCS)
 	string(REGEX REPLACE "^ *(DEFINE_[_A-Z]+ *\\(.*\\)).*"
-			"extern \\1;" FN ${F})
-	file(APPEND ${UDFNAMES} "${FN}\n")
-endforeach()
-file(APPEND ${UDFNAMES} "__declspec(dllexport) UDF_Data udf_data[] = {\n")
-foreach(F IN LISTS FUNCS)
+			"extern \\1;\n" FN ${F})
 	string(REGEX REPLACE "^ *DEFINE_([_A-Z]+) *\\( *([_a-zA-Z0-9]+).*\\).*"
-			"{\"\\2\", (void (*)(void))\\2, UDF_TYPE_\\1}," UDFDATA ${F})
-	file(APPEND ${UDFNAMES} "${UDFDATA}\n")
+			"{\"\\2\", (void (*)(void))\\2, UDF_TYPE_\\1},\n" UDFDATA ${F})
+	set(FUNCS_DECL ${FUNCS_DECL}${FN})
+	set(FUNCS_DATA ${FUNCS_DATA}${UDFDATA})
 endforeach()
-file(APPEND ${UDFNAMES} "};\n__declspec(dllexport) int n_udf_data = sizeof(udf_data)/sizeof(UDF_Data);\n")
-file(APPEND ${UDFNAMES} "#include \"version.h\"\n")
-file(APPEND ${UDFNAMES} "__declspec(dllexport) void UDF_Inquire_Release(int *major, int *minor, int *revision)\n")
-file(APPEND ${UDFNAMES} "{\n  *major = RampantReleaseMajor;\n")
-file(APPEND ${UDFNAMES} "  *minor = RampantReleaseMinor;\n")
-file(APPEND ${UDFNAMES} "  *revision = RampantReleaseRevision;\n}\n")
+configure_file(${PROJECT_SOURCE_DIR}/support/udf_names.c.in ${PROJECT_SOURCE_DIR}/support/udf_names.c)
 
 # Generate udf io header with fluent's resolve command
 if(WIN32)
-execute_process(COMMAND "${FLUENT_INC}\\ntbin\\win64\\resolve.exe" -udf "${PROJECT_SOURCE_DIR}\\${CSOURCES}" -head_file ud_io1.h
+	execute_process(COMMAND "${FLUENT_INC}\\ntbin\\win64\\resolve.exe" -udf "${PROJECT_SOURCE_DIR}\\${CSOURCES}" -head_file ud_io1.h
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/support
 		)
 endif()

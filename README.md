@@ -8,14 +8,13 @@
 
 ```
 /your_cas_folder:
-│  your_CAS.cas
+├─ your_CAS.cas
 │
-├─/lib_name //自定义，编译完成后在fluent中输入这个库名就可以加载udf
-│   │  /your_udf.c //你的udf源文件
-│   │  CMakeLists.txt
-│   │
-│   └─support
-│
-└─/win64  //编译完成的libudf.dll存放目录
+└─/lib_name //自定义，编译完成后在fluent中输入这个库名就可以加载udf
+    ├─/src
+    │   ├─ your_udf.c //你的udf源文件
+    │   ├─ CMakeLists.txt
+    │   └─/support
+    └─/win64  //编译完成的libudf.dll存放目录
 ```
 
